@@ -27,12 +27,24 @@
   tags:
     - cdh
 
+# Mount HFDS devices _only_ under the special hdfs_mount directory,
+# not under /mnt with "ordinary" drives.
+
 - mount:
     name: /{{ hdfs_mount  }}/{{item.item}}
     src: /dev/{{ item.item }}
     fstype: "{{ fstype }}"
     state: mounted
     opts: "noatime"
+  with_items:  "{{ formatted.results }}"
+  when: " item.changed and item.stdout " 
+  tags:
+    - cdh
+
+- mount:
+    name: /mnt/{{item.item}}
+    src: /dev/{{ item.item }}
+    state: unmounted
   with_items:  "{{ formatted.results }}"
   when: " item.changed and item.stdout " 
   tags:
